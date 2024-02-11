@@ -88,7 +88,7 @@ export default function Index() {
 
       </ui-title-bar>
       <BlockStack gap="500">
-        {/*
+          {/*
           <Layout>
             <Layout.Section>
               <Card>
@@ -148,7 +148,7 @@ export default function Index() {
                     </Button>
                     {actionData?.product && (
                       <Button
-                        url={`shopify:admin/products/${productId}`}
+                        url={`shopify:admin/apps/jade-puma-functions/app/volume-discount/19fdf967-7ef9-453c-8d03-e97fdc3aab6c/new`}
                         target="_blank"
                         variant="plain"
                       >
@@ -276,10 +276,7 @@ export default function Index() {
               </BlockStack>
             </Layout.Section>
           </Layout>
-        */}
-
-
-
+          */}
         <layout>
         <card>
 
@@ -295,7 +292,7 @@ export default function Index() {
         >
 
           <img style={{width: "150px"}}  src="https://jadepuma.com/cdn/shop/files/JadePuma-logo_400x.svg?v=1682267029"/>
-          <h2 style={{fontSize: "18px", margin: "30px",marginBottom: "10px", }}>JadePuma Functions</h2>
+
 
           <div
           style={{
@@ -304,17 +301,17 @@ export default function Index() {
             padding: "20px",
             maxWidth: "800px",
             margin: "20px auto",
-            borderBottom:"1px solid #58C69D;", 
+            backgroundColor: "#e5e5e5",
+            borderRadius: "15px"
           }}
         >
           
-        
-          <h2 style={{fontSize: "18px", margin: "30px",marginBottom: "10px", }}>Quantity Breaks:</h2>
-          <ol>
-            <li>Open Discounts Tab</li>
-            <li>Create discount</li>
-            <li>Choose Jadepuma Quantity Breaks</li>
-          </ol>
+      
+          <Button url={`shopify:admin/apps/jade-puma-functions/app/volume-discount/19fdf967-7ef9-453c-8d03-e97fdc3aab6c/new`}>
+              Create Quantity Breaks Discount
+          </Button>
+
+
           </div>
 
           <div
@@ -324,19 +321,18 @@ export default function Index() {
             padding: "20px",
             maxWidth: "800px",
             margin: "20px auto",
-            borderBottom:"1px solid #58C69D;", 
+            backgroundColor: "#e5e5e5",
+            borderRadius: "15px"
           }}
         >
           
-        
-          <h2 style={{fontSize: "18px", margin: "30px",marginBottom: "10px", }}>Invoice Payments Rules:</h2>
-          <ol>
-            <li>Open Settings</li>
-            <li>Payment</li>
-            <li>Manage Payment method Customisation</li>
-            <li>Add Customisation</li>
-            <li>Set the customer tag to allow invoice payment option</li>
-          </ol>
+          <Button url={`shopify:admin/apps/jade-puma-functions/app/payment-customization/e844ecb1-61aa-4310-b58d-547acf7a666d/new`}>
+              Create Invoice Payment Rules
+          </Button>
+
+         
+
+
           </div>
 
 

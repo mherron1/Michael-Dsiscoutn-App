@@ -3,7 +3,7 @@
 client_id = "9ce9cc07f6d3b75b4ab2e3d8c0988ecf"
 name = "JadePuma-Functions"
 handle = "jade-puma-functions"
-application_url = "https://soon-threatening-usually-zope.trycloudflare.com"
+application_url = "https://radios-solaris-cpu-incident.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products, write_discounts, write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://soon-threatening-usually-zope.trycloudflare.com/auth/callback",
-  "https://soon-threatening-usually-zope.trycloudflare.com/auth/shopify/callback",
-  "https://soon-threatening-usually-zope.trycloudflare.com/api/auth/callback"
+  "https://radios-solaris-cpu-incident.trycloudflare.com/auth/callback",
+  "https://radios-solaris-cpu-incident.trycloudflare.com/auth/shopify/callback",
+  "https://radios-solaris-cpu-incident.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

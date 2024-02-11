@@ -182,7 +182,7 @@ export default function VolumeNew() {
   } = useForm({
     fields: {
       discountTitle: useField(""),
-      discountMethod: useField(DiscountMethod.Code),
+      discountMethod: useField(DiscountMethod.Automatic),
       discountCode: useField(""),
       combinesWith: useField({
         orderDiscounts: false,
@@ -266,6 +266,7 @@ export default function VolumeNew() {
                 discountClass={DiscountClass.Product}
                 discountCode={discountCode}
                 discountMethod={discountMethod}
+                discountMethodHidden={true}
               />
                 <Card>
                 <BlockStack gap="3">
