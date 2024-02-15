@@ -125,10 +125,21 @@ export const action = async ({ params, request }) => {
                 namespace: "$app:volume-discount",
                 key: "function-configuration",
                 type: "json",
-                value: JSON.stringify({
-                  quantity: configuration.quantity,
-                  percentage: configuration.percentage,
-                }),
+                value: JSON.stringify(
+                  [{
+                  quantity: 4,
+                  percentage: 53,
+                  },
+                  {
+                    quantity: 5,
+                    percentage: 75, 
+                  },
+                  {
+                    quantity: 6,
+                    percentage: 99, 
+                  }
+                ]
+                ),
               },
             ],
           },
@@ -139,7 +150,7 @@ export const action = async ({ params, request }) => {
     const responseJson = await response.json();
     const errors = responseJson.data.discountCreate?.userErrors;
     return json({ errors });
-  }
+    }
 };
 
 // This is the React component for the page.
@@ -244,7 +255,7 @@ export default function VolumeNew() {
   return (
     // Render a discount form using Polaris components and the discount app components
     <Page
-      title="Create volume discount"
+      title="Create tiered quantity discounts"
       backAction={{
         content: "Discounts",
         onAction: () => onBreadcrumbAction(redirect, true),
@@ -261,7 +272,7 @@ export default function VolumeNew() {
           <Form method="post">
             <BlockStack align="space-around" gap="2">
               <MethodCard
-                title="Volume"
+                title="Quantity Breaks"
                 discountTitle={discountTitle}
                 discountClass={DiscountClass.Product}
                 discountCode={discountCode}
@@ -271,7 +282,7 @@ export default function VolumeNew() {
                 <Card>
                 <BlockStack gap="3">
                     <Text variant="headingMd" as="h2">
-                    Volume
+                    Tier 1
                     </Text>
                     <TextField
                     label="Minimum quantity"
@@ -286,6 +297,46 @@ export default function VolumeNew() {
                     />
                 </BlockStack>
                 </Card>
+
+                <Card>
+                <BlockStack gap="3">
+                    <Text variant="headingMd" as="h2">
+                    Tier 2
+                    </Text>
+                    <TextField
+                    label="Minimum quantity"
+                    autoComplete="on"
+                    {...configuration.quantity_2}
+                    />
+                    <TextField
+                    label="Discount percentage"
+                    autoComplete="on"
+                    {...configuration.percentage_2}
+                    suffix="%"
+                    />
+                </BlockStack>
+                </Card>
+
+                <Card>
+                <BlockStack gap="3">
+                    <Text variant="headingMd" as="h2">
+                    Tier 3
+                    </Text>
+                    <TextField
+                    label="Minimum quantity"
+                    autoComplete="on"
+                    {...configuration.quantity_3}
+                    />
+                    <TextField
+                    label="Discount percentage"
+                    autoComplete="on"
+                    {...configuration.percentage_3}
+                    suffix="%"
+                    />
+                </BlockStack>
+                </Card>
+
+
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
                   totalUsageLimit={usageLimit}

@@ -84,11 +84,14 @@ export default function Index() {
 
   return (
     <Page>
-      <ui-title-bar title="">
+    <ui-title-bar title="Products">
 
-      </ui-title-bar>
+    </ui-title-bar>
       <BlockStack gap="500">
-          {/*
+
+       {/*
+
+          
           <Layout>
             <Layout.Section>
               <Card>
@@ -276,7 +279,9 @@ export default function Index() {
               </BlockStack>
             </Layout.Section>
           </Layout>
-          */}
+          
+        */}
+
         <layout>
         <card>
 
@@ -340,6 +345,8 @@ export default function Index() {
 
         </card>
        </layout>
+
+
 
       </BlockStack>
     </Page>
