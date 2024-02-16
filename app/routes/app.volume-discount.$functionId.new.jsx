@@ -127,17 +127,21 @@ export const action = async ({ params, request }) => {
                 type: "json",
                 value: JSON.stringify(
                   [{
-                  quantity: 4,
-                  percentage: 53,
+                    quantity: configuration.quantity,
+                    percentage: configuration.percentage,
                   },
                   {
-                    quantity: 5,
-                    percentage: 75, 
+                    quantity: configuration.quantity_2,
+                    percentage: configuration.percentage_2,
                   },
                   {
-                    quantity: 6,
-                    percentage: 99, 
-                  }
+                    quantity: configuration.quantity_3,
+                    percentage: configuration.percentage_3,
+                  },
+                  {
+                    quantity: configuration.quantity_4,
+                    percentage: configuration.percentage_4,
+                  },
                 ]
                 ),
               },
@@ -208,8 +212,14 @@ export default function VolumeNew() {
       startDate: useField(todaysDate),
       endDate: useField(null),
       configuration: { // Add quantity and percentage configuration to form data
-        quantity: useField('1'),
-        percentage: useField('0'),
+        quantity: useField('2'),
+        percentage: useField('10'),
+        quantity_2: useField(''), 
+        percentage_2: useField(''), 
+        quantity_3: useField(''), 
+        percentage_3: useField(''), 
+        quantity_4: useField(''),
+        percentage_4: useField(''), 
       }
     },
     onSubmit: async (form) => {
@@ -225,6 +235,12 @@ export default function VolumeNew() {
         configuration: {
             quantity: parseInt(form.configuration.quantity),
             percentage: parseFloat(form.configuration.percentage),
+            quantity_2: parseInt(form.configuration.quantity_2),
+            percentage_2: parseFloat(form.configuration.percentage_2), 
+            quantity_3: parseInt(form.configuration.quantity_3), 
+            percentage_3: parseFloat(form.configuration.percentage_3), 
+            quantity_4: parseInt(form.configuration.quantity_4), 
+            percentage_4: parseFloat(form.configuration.percentage_4), 
           },
       };
 
@@ -298,42 +314,62 @@ export default function VolumeNew() {
                 </BlockStack>
                 </Card>
 
+
                 <Card>
-                <BlockStack gap="3">
+                  <BlockStack gap="3">
                     <Text variant="headingMd" as="h2">
-                    Tier 2
+                      Tier 2 (Optional)
                     </Text>
                     <TextField
-                    label="Minimum quantity"
-                    autoComplete="on"
-                    {...configuration.quantity_2}
+                      label="Minimum quantity"
+                      autoComplete="on"
+                      {...configuration.quantity_2}
                     />
                     <TextField
-                    label="Discount percentage"
-                    autoComplete="on"
-                    {...configuration.percentage_2}
-                    suffix="%"
+                      label="Discount percentage"
+                      autoComplete="on"
+                      {...configuration.percentage_2}
+                      suffix="%"
                     />
-                </BlockStack>
+                  </BlockStack>
                 </Card>
 
                 <Card>
-                <BlockStack gap="3">
+                  <BlockStack gap="3">
                     <Text variant="headingMd" as="h2">
-                    Tier 3
+                      Tier 3 (Optional)
                     </Text>
                     <TextField
-                    label="Minimum quantity"
-                    autoComplete="on"
-                    {...configuration.quantity_3}
+                      label="Minimum quantity"
+                      autoComplete="on"
+                      {...configuration.quantity_3}
                     />
                     <TextField
-                    label="Discount percentage"
-                    autoComplete="on"
-                    {...configuration.percentage_3}
-                    suffix="%"
+                      label="Discount percentage"
+                      autoComplete="on"
+                      {...configuration.percentage_3}
+                      suffix="%"
                     />
-                </BlockStack>
+                  </BlockStack>
+                </Card>
+
+                <Card>
+                  <BlockStack gap="3">
+                    <Text variant="headingMd" as="h2">
+                      Tier 4 (Optional)
+                    </Text>
+                    <TextField
+                      label="Minimum quantity"
+                      autoComplete="on"
+                      {...configuration.quantity_4}
+                    />
+                    <TextField
+                      label="Discount percentage"
+                      autoComplete="on"
+                      {...configuration.percentage_4}
+                      suffix="%"
+                    />
+                  </BlockStack>
                 </Card>
 
 
