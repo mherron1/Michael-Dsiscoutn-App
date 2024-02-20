@@ -3,7 +3,7 @@
 client_id = "9ce9cc07f6d3b75b4ab2e3d8c0988ecf"
 name = "JadePuma-Functions"
 handle = "jade-puma-functions"
-application_url = "https://pension-accomplished-malawi-quad.trycloudflare.com"
+application_url = "https://ongoing-previews-ti-album.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products, write_discounts, write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://pension-accomplished-malawi-quad.trycloudflare.com/auth/callback",
-  "https://pension-accomplished-malawi-quad.trycloudflare.com/auth/shopify/callback",
-  "https://pension-accomplished-malawi-quad.trycloudflare.com/api/auth/callback"
+  "https://ongoing-previews-ti-album.trycloudflare.com/auth/callback",
+  "https://ongoing-previews-ti-album.trycloudflare.com/auth/shopify/callback",
+  "https://ongoing-previews-ti-album.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

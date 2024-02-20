@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useEffect, useMemo } from "react";
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
@@ -25,6 +26,7 @@ import {
 import {
   Banner,
   Card,
+  Button,
   Text,
   Layout,
   Page,
@@ -214,12 +216,12 @@ export default function VolumeNew() {
       configuration: { // Add quantity and percentage configuration to form data
         quantity: useField('2'),
         percentage: useField('10'),
-        quantity_2: useField(''), 
-        percentage_2: useField(''), 
-        quantity_3: useField(''), 
-        percentage_3: useField(''), 
-        quantity_4: useField(''),
-        percentage_4: useField(''), 
+        quantity_2: useField('0'), 
+        percentage_2: useField('0'), 
+        quantity_3: useField('0'), 
+        percentage_3: useField('0'), 
+        quantity_4: useField('0'),
+        percentage_4: useField('0'), 
       }
     },
     onSubmit: async (form) => {
@@ -268,6 +270,36 @@ export default function VolumeNew() {
       </Layout.Section>
     ) : null;
 
+
+  const [visibleTiers, setVisibleTiers] = useState(1);
+  
+
+  // Function to add a new tier
+  const addTier = () => {
+    setVisibleTiers(current => Math.min(current + 1, 4)); // Assuming a maximum of 4 tiers
+  };
+
+  const removeTier = () => {
+
+    if(visibleTiers == 2){
+      configuration.quantity_2.value = 0;
+      configuration.percentage_2.value = 0;
+    }
+    if(visibleTiers == 3){
+      configuration.quantity_3.value = 0;
+      configuration.percentage_3.value = 0;
+    }
+    if(visibleTiers == 4){
+      configuration.quantity_4.value = 0;
+      configuration.percentage_4.value = 0;
+    }
+
+     
+    setVisibleTiers(current => Math.min(current - 1, 4)); // Assuming a maximum of 4 tiers
+    
+  };
+
+
   return (
     // Render a discount form using Polaris components and the discount app components
     <Page
@@ -295,82 +327,65 @@ export default function VolumeNew() {
                 discountMethod={discountMethod}
                 discountMethodHidden={true}
               />
-                <Card>
-                <BlockStack gap="3">
-                    <Text variant="headingMd" as="h2">
-                    Tier 1
-                    </Text>
-                    <TextField
-                    label="Minimum quantity"
-                    autoComplete="on"
-                    {...configuration.quantity}
-                    />
-                    <TextField
-                    label="Discount percentage"
-                    autoComplete="on"
-                    {...configuration.percentage}
-                    suffix="%"
-                    />
-                </BlockStack>
-                </Card>
+                   <>
+      <Card>
+        <BlockStack gap="3">
+          <Text variant="headingMd" as="h2">Tier 1</Text>
+          <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity}  />
+          <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage}  suffix="%" />
+        </BlockStack>
+      </Card>
+
+      {visibleTiers >= 2 && (
+        <Card>
+          <BlockStack gap="3">
+            <Text variant="headingMd" as="h2">Tier 2 </Text>
+            <TextField class="test1"  label="Minimum quantity" autoComplete="on"  {...configuration.quantity_2}  />
+            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_2}  suffix="%" />
+          </BlockStack>
+        </Card>
+      )}
+
+      {visibleTiers >= 3 && (
+        <Card>
+          <BlockStack gap="3">
+            <Text variant="headingMd" as="h2">Tier 3 </Text>
+            <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_3}  />
+            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_3}  suffix="%" />
+          </BlockStack>
+        </Card>
+      )}
+
+      {visibleTiers >= 4 && (
+        <Card>
+          <BlockStack gap="3">
+            <Text variant="headingMd" as="h2">Tier 4 </Text>
+            <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_4}  />
+            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_4}  suffix="%" />
+          </BlockStack>
+        </Card>
+      )}
+
+      {visibleTiers < 4 && (
+        <div style={{ maxWidth: '200px', margin: '10px auto', marginBottom: "20px", display: 'block' }}>
+        <Button onClick={addTier} fullWidth={false}>
+          Add Tier
+        </Button>
+      </div>
+
+      )}
+
+      {visibleTiers > 1 && (
+        <div style={{ maxWidth: '200px', margin: '10px auto', marginBottom: '20px', display: 'block' }}>
+        <Button onClick={removeTier} fullWidth={false}>
+          Remove Tier
+        </Button>
+      </div>
+
+      )}
 
 
-                <Card>
-                  <BlockStack gap="3">
-                    <Text variant="headingMd" as="h2">
-                      Tier 2 (Optional)
-                    </Text>
-                    <TextField
-                      label="Minimum quantity"
-                      autoComplete="on"
-                      {...configuration.quantity_2}
-                    />
-                    <TextField
-                      label="Discount percentage"
-                      autoComplete="on"
-                      {...configuration.percentage_2}
-                      suffix="%"
-                    />
-                  </BlockStack>
-                </Card>
-
-                <Card>
-                  <BlockStack gap="3">
-                    <Text variant="headingMd" as="h2">
-                      Tier 3 (Optional)
-                    </Text>
-                    <TextField
-                      label="Minimum quantity"
-                      autoComplete="on"
-                      {...configuration.quantity_3}
-                    />
-                    <TextField
-                      label="Discount percentage"
-                      autoComplete="on"
-                      {...configuration.percentage_3}
-                      suffix="%"
-                    />
-                  </BlockStack>
-                </Card>
-
-                <Card>
-                  <BlockStack gap="3">
-                    <Text variant="headingMd" as="h2">
-                      Tier 4 (Optional)
-                    </Text>
-                    <TextField
-                      label="Minimum quantity"
-                      autoComplete="on"
-                      {...configuration.quantity_4}
-                    />
-                    <TextField
-                      label="Discount percentage"
-                      autoComplete="on"
-                      {...configuration.percentage_4}
-                      suffix="%"
-                    />
-                  </BlockStack>
-                </Card>
+    </>
 
 
               {discountMethod.value === DiscountMethod.Code && (

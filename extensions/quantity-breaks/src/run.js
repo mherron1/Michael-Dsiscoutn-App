@@ -58,6 +58,8 @@ export function run(input) {
       .shift(); // Take the first element after sorting.
 
     if (applicableDiscount) {
+      if(applicableDiscount.quantity != 0){
+
       discountsToApply.push({
         targets: [{
           productVariant: {
@@ -69,8 +71,10 @@ export function run(input) {
             value: applicableDiscount.percentage.toString(),
           },
         },
+        "message": "BUY " + applicableDiscount.quantity +  " GET " + applicableDiscount.percentage.toString() + "% OFF"
       });
     }
+  }
   });
 
   // If no discounts to apply, return the default empty discount structure.
