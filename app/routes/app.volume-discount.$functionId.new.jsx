@@ -366,9 +366,9 @@ export default function VolumeNew() {
         </Card>
       )}
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', margin:'20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '210px', margin:'20px' }}>
           {visibleTiers < 4 && (
-            <div style={{ maxWidth: '200px' }}>
+            <div style={{ width: '100px' }}>
               <Button onClick={addTier} fullWidth={false}>
                 Add Tier
               </Button>
@@ -376,7 +376,7 @@ export default function VolumeNew() {
           )}
 
           {visibleTiers > 1 && (
-            <div style={{ maxWidth: '200px' }}>
+            <div style={{ width: '100px' }}>
               <Button onClick={removeTier} fullWidth={false}>
                 Remove Tier
               </Button>
