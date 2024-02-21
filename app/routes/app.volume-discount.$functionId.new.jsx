@@ -327,7 +327,7 @@ export default function VolumeNew() {
                 discountMethod={discountMethod}
                 discountMethodHidden={true}
               />
-                   <>
+                   <>       
       <Card>
         <BlockStack gap="3">
           <Text variant="headingMd" as="h2">Tier 1</Text>

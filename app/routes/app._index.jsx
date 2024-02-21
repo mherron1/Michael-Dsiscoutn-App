@@ -313,7 +313,7 @@ export default function Index() {
           
       
           <Button url={`shopify:admin/apps/jade-puma-functions/app/volume-discount/19fdf967-7ef9-453c-8d03-e97fdc3aab6c/new`}>
-              Create Quantity Breaks Discount
+              Create a Quantity Breaks Discount
           </Button>
 
 
