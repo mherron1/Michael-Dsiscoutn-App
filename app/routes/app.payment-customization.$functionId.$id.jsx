@@ -180,7 +180,7 @@ export default function PaymentCustomization() {
 
   return (
     <Page
-      title="Show Payment Method"
+      title="Show Payment Method When Over Set Amount"
       backAction={{
         content: "Payment customizations",
         onAction: () =>
