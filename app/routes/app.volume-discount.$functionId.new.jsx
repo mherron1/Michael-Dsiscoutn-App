@@ -368,16 +368,16 @@ export default function VolumeNew() {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin:'20px' }}>
           {visibleTiers < 4 && (
-            <div style={{ width: '100px' }}>
-              <Button onClick={addTier} fullWidth={false}>
+            <div>
+              <Button style={{ width: '100px' }} onClick={addTier} fullWidth={false}>
                 Add Tier
               </Button>
             </div>
           )}
 
           {visibleTiers > 1 && (
-            <div style={{ width: '100px' }}>
-              <Button onClick={removeTier} fullWidth={false}>
+            <div>
+              <Button style={{ width: '100px' }} onClick={removeTier} fullWidth={false}>
                 Remove Tier
               </Button>
             </div>
