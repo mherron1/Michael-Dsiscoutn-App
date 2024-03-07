@@ -12,78 +12,78 @@ import { DiscountApplicationStrategy } from "../generated/api";
 * @type {FunctionRunResult}
 */
 const EMPTY_DISCOUNT = {
-  discountApplicationStrategy: DiscountApplicationStrategy.Maximum,
+  discountApplicationStrategy: DiscountApplicationStrategy.First,
   discounts: [],
 };
-
-/**
-* Parses the discount configuration from the metafield value.
-* @param {string} value - The JSON string from the metafield.
-* @returns {Array<{quantity: number, percentage: number}>}
-*/
-function parseDiscountConfig(value) {
-  try {
-    const config = JSON.parse(value);
-    // Ensure the configuration is in the expected format (array of objects).
-    if (Array.isArray(config)) {
-      return config;
-    }
-    console.error("Discount configuration is not an array.");
-  } catch (error) {
-    console.error("Error parsing discount configuration:", error);
-  }
-  return [];
-}
 
 /**
 * @param {RunInput} input
 * @returns {FunctionRunResult}
 */
 export function run(input) {
-  // Extract and parse the discount configurations from the metafield value.
-  const discountConfigs = parseDiscountConfig(input?.discountNode?.metafield?.value ?? "[]");
-
-  let discountsToApply = [];
-
-  // Iterate through each cart line to determine applicable discounts.
-  input.cart.lines.forEach(line => {
-    if (line.merchandise.__typename !== "ProductVariant") {
-      return;
+  // Define a type for your configuration, and parse it from the metafield
+  /**
+  * @type {{
+  *   quantity: number
+  *   percentage: number
+  * }}
+  */
+  const configuration = JSON.parse(
+    input?.discountNode?.metafield?.value ?? "{}"
+  );
+  configuration.tiers.map(tier=>{
+    if (!tier.quantity || !tier.percentage) {
+      return EMPTY_DISCOUNT;
     }
+    return null
+  })
 
-    // Find the highest applicable discount for the line based on quantity.
-    const applicableDiscount = discountConfigs
-      .filter(config => line.quantity >= config.quantity)
+ let discountsToApply =[]
+  const targets = input.cart.lines
+    // Use the configured quantity instead of a hardcoded value
+    // 
+    .forEach((line) => {
+      if (line.merchandise.__typename !== "ProductVariant") {
+        return;
+      }
+      const applicableDiscount = configuration.tiers
+      .filter(config => line.quantity >= config.quantity && line.merchandise.product.inAnyCollection)
       .sort((a, b) => b.quantity - a.quantity) // Sort to get the highest quantity first.
-      .shift(); // Take the first element after sorting.
+      .shift();
 
-    if (applicableDiscount) {
-      if(applicableDiscount.quantity != 0){
-
-      discountsToApply.push({
-        targets: [{
-          productVariant: {
-            id: line.merchandise.id,
+      if (applicableDiscount) {
+        if(applicableDiscount.quantity != 0){
+  
+        discountsToApply.push({
+          targets: [{
+            productVariant: {
+              id: line.merchandise.id,
+            },
+          }],
+          value: {
+            percentage: {
+              value: applicableDiscount.percentage.toString(),
+            },
           },
-        }],
-        value: {
-          percentage: {
-            value: applicableDiscount.percentage.toString(),
-          },
-        },
-        "message": "BUY " + applicableDiscount.quantity +  " GET " + applicableDiscount.percentage.toString() + "% OFF"
-      });
+          "message": "BUY " + applicableDiscount.quantity +  " GET " + applicableDiscount.percentage.toString() + "% OFF"
+        });
+      }
     }
-  }
-  });
+    } 
+      
+      )
 
-  // If no discounts to apply, return the default empty discount structure.
-  if (discountsToApply.length === 0) {
+  
+
+  if (!discountsToApply.length) {
+    console.error("No cart lines qualify for volume discount.");
     return EMPTY_DISCOUNT;
   }
-
+ 
+  
+console.log(JSON.stringify(discountsToApply),'discountsToApply')
   return {
     discounts: discountsToApply,
-    discountApplicationStrategy: DiscountApplicationStrategy.Maximum,
+    discountApplicationStrategy: DiscountApplicationStrategy.First
   };
 };

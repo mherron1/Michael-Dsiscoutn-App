@@ -1,18 +1,23 @@
-query RunInput {
+query GetCartContents($selectedCollectionIds: [ID!]!) {
   cart {
     lines {
       quantity
       merchandise {
         __typename
-        ...on ProductVariant {
+        ... on ProductVariant {
           id
+          product {
+            id
+            inAnyCollection(ids: $selectedCollectionIds)
+          }
         }
       }
     }
   }
   discountNode {
-    metafield(namespace: "$app:volume-discount", key: "function-configuration") {
+     metafield(namespace: "$app:volume-discount", key: "function-configuration"){
       value
+
     }
   }
 }

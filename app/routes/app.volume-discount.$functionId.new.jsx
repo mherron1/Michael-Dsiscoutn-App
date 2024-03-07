@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -8,6 +7,7 @@ import { CurrencyCode } from "@shopify/react-i18n";
 import {
   Form,
   useActionData,
+  useLoaderData,
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
@@ -33,9 +33,35 @@ import {
   PageActions,
   TextField,
   BlockStack,
+  Select
 } from "@shopify/polaris";
 
-import shopify from "../shopify.server";
+import shopify, { authenticate } from "../shopify.server";
+
+export const loader = async ({ request }) => {
+
+  const { admin } = await authenticate.admin(request)
+
+  const cls = await admin.graphql(`
+    #graphql
+    query{
+      collections(first:  50) {
+        edges {
+          node {
+            id
+            handle
+           
+          }
+        }
+      }
+    }
+    
+    `)
+
+  const collections = await cls.json()
+  return collections
+
+}
 
 // This is a server-side action that is invoked when the form is submitted.
 // It makes an admin GraphQL request to create a discount.
@@ -45,11 +71,7 @@ export const action = async ({ params, request }) => {
   const formData = await request.formData();
   const {
     title,
-    method,
-    code,
     combinesWith,
-    usageLimit,
-    appliesOncePerCustomer,
     startsAt,
     endsAt,
     configuration,
@@ -63,104 +85,71 @@ export const action = async ({ params, request }) => {
     endsAt: endsAt && new Date(endsAt),
   };
 
-  if (method === DiscountMethod.Code) {
-    const baseCodeDiscount = {
-      ...baseDiscount,
-      title: code,
-      code,
-      usageLimit,
-      appliesOncePerCustomer,
-    };
 
-    const response = await admin.graphql(
-      `#graphql
-          mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
-            discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
-              userErrors {
-                code
-                message
-                field
-              }
+  const response = await admin.graphql(
+    `#graphql
+        mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
+          discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
+            userErrors {
+              code
+              message
+              field
             }
-          }`,
-      {
-        variables: {
-          discount: {
-            ...baseCodeDiscount,
-            metafields: [
-              {
-                namespace: "$app:volume-discount",
-                key: "function-configuration",
-                type: "json",
-                value: JSON.stringify({
-                  quantity: configuration.quantity,
-                  percentage: configuration.percentage,
-                }),
-              },
-            ],
-          },
-        },
-      }
-    );
+          }
+        }`,
+    {
+      variables: {
+        discount: {
+          ...baseDiscount,
+          metafields: [
+            {
+              namespace: "$app:volume-discount",
+              key: "function-configuration",
+              type: "json",
+              value: JSON.stringify(
+                {
+                  selectedCollectionIds: configuration.selectedCollectionIds,
+                  tiers: [
+                    {
+                      quantity: configuration.quantity,
+                      percentage: configuration.percentage,
+                    },
+                    {
+                      quantity: configuration.quantity_2,
+                      percentage: configuration.percentage_2,
+                    },
+                    {
+                      quantity: configuration.quantity_3,
+                      percentage: configuration.percentage_3,
+                    },
+                    {
+                      quantity: configuration.quantity_4,
+                      percentage: configuration.percentage_4,
+                    },
+                  ]
+                },
 
-    const responseJson = await response.json();
-    const errors = responseJson.data.discountCreate?.userErrors;
-    return json({ errors });
-  } else {
-    const response = await admin.graphql(
-      `#graphql
-          mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
-            discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-              userErrors {
-                code
-                message
-                field
-              }
-            }
-          }`,
-      {
-        variables: {
-          discount: {
-            ...baseDiscount,
-            metafields: [
-              {
-                namespace: "$app:volume-discount",
-                key: "function-configuration",
-                type: "json",
-                value: JSON.stringify(
-                  [{
-                    quantity: configuration.quantity,
-                    percentage: configuration.percentage,
-                  },
-                  {
-                    quantity: configuration.quantity_2,
-                    percentage: configuration.percentage_2,
-                  },
-                  {
-                    quantity: configuration.quantity_3,
-                    percentage: configuration.percentage_3,
-                  },
-                  {
-                    quantity: configuration.quantity_4,
-                    percentage: configuration.percentage_4,
-                  },
-                ]
-                ),
-              },
-            ],
-          },
-        },
-      }
-    );
 
-    const responseJson = await response.json();
-    const errors = responseJson.data.discountCreate?.userErrors;
-    return json({ errors });
+
+              ),
+            },
+          ],
+        },
+      },
     }
+  );
+  const responseJson = await response.json();
+  const errors = responseJson.data.discountCreate?.userErrors;
+  return json({ errors });
 };
 
 // This is the React component for the page.
 export default function VolumeNew() {
+  const { data } = useLoaderData()
+  const myCollections = data.collections.edges.map(node => {
+    return { label: node.node.handle, value: node.node.id }
+  })
+
   const submitForm = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
@@ -194,6 +183,7 @@ export default function VolumeNew() {
       startDate,
       endDate,
       configuration,
+      selectedCollection
     },
     submit,
   } = useForm({
@@ -201,6 +191,7 @@ export default function VolumeNew() {
       discountTitle: useField(""),
       discountMethod: useField(DiscountMethod.Automatic),
       discountCode: useField(""),
+      selectedCollection: useField(''),
       combinesWith: useField({
         orderDiscounts: false,
         productDiscounts: false,
@@ -213,15 +204,17 @@ export default function VolumeNew() {
       appliesOncePerCustomer: useField(false),
       startDate: useField(todaysDate),
       endDate: useField(null),
+
       configuration: { // Add quantity and percentage configuration to form data
         quantity: useField('2'),
         percentage: useField('10'),
-        quantity_2: useField('0'), 
-        percentage_2: useField('0'), 
-        quantity_3: useField('0'), 
-        percentage_3: useField('0'), 
+        quantity_2: useField('0'),
+        percentage_2: useField('0'),
+        quantity_3: useField('0'),
+        percentage_3: useField('0'),
         quantity_4: useField('0'),
-        percentage_4: useField('0'), 
+        percentage_4: useField('0'),
+        selectedCollection: useField(''),
       }
     },
     onSubmit: async (form) => {
@@ -235,15 +228,17 @@ export default function VolumeNew() {
         startsAt: form.startDate,
         endsAt: form.endDate,
         configuration: {
-            quantity: parseInt(form.configuration.quantity),
-            percentage: parseFloat(form.configuration.percentage),
-            quantity_2: parseInt(form.configuration.quantity_2),
-            percentage_2: parseFloat(form.configuration.percentage_2), 
-            quantity_3: parseInt(form.configuration.quantity_3), 
-            percentage_3: parseFloat(form.configuration.percentage_3), 
-            quantity_4: parseInt(form.configuration.quantity_4), 
-            percentage_4: parseFloat(form.configuration.percentage_4), 
-          },
+          quantity: parseInt(form.configuration.quantity),
+          percentage: parseFloat(form.configuration.percentage),
+          quantity_2: parseInt(form.configuration.quantity_2),
+          percentage_2: parseFloat(form.configuration.percentage_2),
+          quantity_3: parseInt(form.configuration.quantity_3),
+          percentage_3: parseFloat(form.configuration.percentage_3),
+          quantity_4: parseInt(form.configuration.quantity_4),
+          percentage_4: parseFloat(form.configuration.percentage_4),
+          selectedCollectionIds: selectedCollection.value
+
+        },
       };
 
       submitForm({ discount: JSON.stringify(discount) }, { method: "post" });
@@ -272,7 +267,7 @@ export default function VolumeNew() {
 
 
   const [visibleTiers, setVisibleTiers] = useState(1);
-  
+
 
   // Function to add a new tier
   const addTier = () => {
@@ -281,27 +276,27 @@ export default function VolumeNew() {
 
   const removeTier = () => {
 
-    if(visibleTiers == 2){
+    if (visibleTiers == 2) {
       configuration.quantity_2.value = 0;
       configuration.percentage_2.value = 0;
     }
-    if(visibleTiers == 3){
+    if (visibleTiers == 3) {
       configuration.quantity_3.value = 0;
       configuration.percentage_3.value = 0;
     }
-    if(visibleTiers == 4){
+    if (visibleTiers == 4) {
       configuration.quantity_4.value = 0;
       configuration.percentage_4.value = 0;
     }
 
-     
-    setVisibleTiers(current => Math.min(current - 1, 4)); // Assuming a maximum of 4 tiers
-    
-  };
 
+    setVisibleTiers(current => Math.min(current - 1, 4)); // Assuming a maximum of 4 tiers
+
+  };
 
   return (
     // Render a discount form using Polaris components and the discount app components
+
     <Page
       title="Create tiered quantity discounts"
       backAction={{
@@ -327,66 +322,73 @@ export default function VolumeNew() {
                 discountMethod={discountMethod}
                 discountMethodHidden={true}
               />
-                   <>       
-      <Card>
-        <BlockStack gap="3">
-          <Text variant="headingMd" as="h2">Tier 1</Text>
-          <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity}  />
-          <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage}  suffix="%" />
-        </BlockStack>
-      </Card>
+              <>
+                <Card>
+                  <Select
+                    label="Select a Collection"
+                    options={myCollections}
+                    {...selectedCollection}
+                  />
+                </Card>
+                <Card>
+                  <BlockStack gap="3">
+                    <Text variant="headingMd" as="h2">Tier 1</Text>
+                    <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity} />
+                    <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage} suffix="%" />
+                  </BlockStack>
+                </Card>
 
-      {visibleTiers >= 2 && (
-        <Card>
-          <BlockStack gap="3">
-            <Text variant="headingMd" as="h2">Tier 2 </Text>
-            <TextField class="test1"  label="Minimum quantity" autoComplete="on"  {...configuration.quantity_2}  />
-            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_2}  suffix="%" />
-          </BlockStack>
-        </Card>
-      )}
+                {visibleTiers >= 2 && (
+                  <Card>
+                    <BlockStack gap="3">
+                      <Text variant="headingMd" as="h2">Tier 2 </Text>
+                      <TextField class="test1" label="Minimum quantity" autoComplete="on"  {...configuration.quantity_2} />
+                      <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_2} suffix="%" />
+                    </BlockStack>
+                  </Card>
+                )}
 
-      {visibleTiers >= 3 && (
-        <Card>
-          <BlockStack gap="3">
-            <Text variant="headingMd" as="h2">Tier 3 </Text>
-            <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_3}  />
-            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_3}  suffix="%" />
-          </BlockStack>
-        </Card>
-      )}
+                {visibleTiers >= 3 && (
+                  <Card>
+                    <BlockStack gap="3">
+                      <Text variant="headingMd" as="h2">Tier 3 </Text>
+                      <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_3} />
+                      <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_3} suffix="%" />
+                    </BlockStack>
+                  </Card>
+                )}
 
-      {visibleTiers >= 4 && (
-        <Card>
-          <BlockStack gap="3">
-            <Text variant="headingMd" as="h2">Tier 4 </Text>
-            <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_4}  />
-            <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_4}  suffix="%" />
-          </BlockStack>
-        </Card>
-      )}
+                {visibleTiers >= 4 && (
+                  <Card>
+                    <BlockStack gap="3">
+                      <Text variant="headingMd" as="h2">Tier 4 </Text>
+                      <TextField label="Minimum quantity" autoComplete="on"  {...configuration.quantity_4} />
+                      <TextField label="Discount percentage" autoComplete="on"  {...configuration.percentage_4} suffix="%" />
+                    </BlockStack>
+                  </Card>
+                )}
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin:'20px' }}>
-          {visibleTiers < 4 && (
-            <div>
-              <Button style={{ width: '100px' }} onClick={addTier} fullWidth={false}>
-                Add Tier
-              </Button>
-            </div>
-          )}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '20px' }}>
+                  {visibleTiers < 4 && (
+                    <div>
+                      <Button style={{ width: '100px' }} onClick={addTier} fullWidth={false}>
+                        Add Tier
+                      </Button>
+                    </div>
+                  )}
 
-          {visibleTiers > 1 && (
-            <div>
-              <Button style={{ width: '100px' }} onClick={removeTier} fullWidth={false}>
-                Remove Tier
-              </Button>
-            </div>
-          )}
-        </div>
+                  {visibleTiers > 1 && (
+                    <div>
+                      <Button style={{ width: '100px' }} onClick={removeTier} fullWidth={false}>
+                        Remove Tier
+                      </Button>
+                    </div>
+                  )}
+                </div>
 
 
 
-    </>
+              </>
 
 
               {discountMethod.value === DiscountMethod.Code && (
