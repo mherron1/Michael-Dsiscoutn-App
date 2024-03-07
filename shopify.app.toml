@@ -3,7 +3,7 @@
 client_id = "9ce9cc07f6d3b75b4ab2e3d8c0988ecf"
 name = "JadePuma-Functions"
 handle = "jade-puma-functions"
-application_url = "https://mobiles-harmful-thy-charms.trycloudflare.com"
+application_url = "https://eight-connector-eugene-performs.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products, write_discounts, write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://mobiles-harmful-thy-charms.trycloudflare.com/auth/callback",
-  "https://mobiles-harmful-thy-charms.trycloudflare.com/auth/shopify/callback",
-  "https://mobiles-harmful-thy-charms.trycloudflare.com/api/auth/callback"
+  "https://eight-connector-eugene-performs.trycloudflare.com/auth/callback",
+  "https://eight-connector-eugene-performs.trycloudflare.com/auth/shopify/callback",
+  "https://eight-connector-eugene-performs.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
