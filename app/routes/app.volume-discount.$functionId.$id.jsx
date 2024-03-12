@@ -299,7 +299,7 @@ export default function VolumeNew() {
     const myCollections = collections.map(node => {
         return { label: node.node.handle, value: node.node.id }
     })
-    console.log(tiers, 'tiers')
+
     const submitForm = useSubmit();
     const actionData = useActionData();
     const navigation = useNavigation();
@@ -446,7 +446,8 @@ export default function VolumeNew() {
     };
 
 
-
+    let filteredCollections = myCollections.filter(cls => cls.label != 'frontpage')
+    // console.log(filteredCollections, 'filteredCollections')
     return (
         // Render a discount form using Polaris components and the discount app components
 
@@ -479,7 +480,7 @@ export default function VolumeNew() {
                                 <Card>
                                     <Select
                                         label="Select a Collection"
-                                        options={myCollections}
+                                        options={filteredCollections}
                                         {...selectedCollection}
 
 

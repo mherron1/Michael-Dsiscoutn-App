@@ -3,7 +3,7 @@
 client_id = "681f413aa8c17c5fccc785824f778da7"
 name = "discount-app-v77"
 handle = "discount-app-v77"
-application_url = "https://earrings-fighting-figured-acting.trycloudflare.com"
+application_url = "https://off-her-believe-september.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_products,read_discounts,write_discounts"
 
 [auth]
 redirect_urls = [
-  "https://earrings-fighting-figured-acting.trycloudflare.com/auth/callback",
-  "https://earrings-fighting-figured-acting.trycloudflare.com/auth/shopify/callback",
-  "https://earrings-fighting-figured-acting.trycloudflare.com/api/auth/callback"
+  "https://off-her-believe-september.trycloudflare.com/auth/callback",
+  "https://off-her-believe-september.trycloudflare.com/auth/shopify/callback",
+  "https://off-her-believe-september.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
