@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -294,8 +294,8 @@ export default function VolumeNew() {
     const { discount, collections } = useLoaderData()
     const { metafieldId } = discount.configuration;
     const tiers = discount.configuration.tiers.filter(tier => tier.quantity > 0)
-    // const tiersActive = tiers.filter(tier => { return tier.quantity > 0 })
-    // let currentDiscountId = responseJson.data.discountNode.id
+
+
     const myCollections = collections.map(node => {
         return { label: node.node.handle, value: node.node.id }
     })
@@ -317,6 +317,8 @@ export default function VolumeNew() {
             });
         }
     }, [actionData]);
+
+
 
     const {
         fields: {
@@ -359,7 +361,7 @@ export default function VolumeNew() {
                 quantity_4: useField(tiers[3]?.quantity),
                 percentage_4: useField(tiers[3]?.percentage),
             },
-            selectedCollection: useField(''),
+            selectedCollection: useField(discount.configuration.selectedCollectionIds),
 
         },
         onSubmit: async (form) => {
@@ -443,7 +445,8 @@ export default function VolumeNew() {
 
     };
 
-    // console.log('currentDiscountId', currentDiscountId)
+
+
     return (
         // Render a discount form using Polaris components and the discount app components
 
@@ -479,7 +482,13 @@ export default function VolumeNew() {
                                         options={myCollections}
                                         {...selectedCollection}
 
+
+
+
+
+
                                     />
+
                                 </Card>
                                 <Card>
                                     <BlockStack gap="3">
