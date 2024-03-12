@@ -293,8 +293,10 @@ export default function VolumeNew() {
     setVisibleTiers(current => Math.min(current - 1, 4)); // Assuming a maximum of 4 tiers
 
   };
-  let filteredCollections = myCollections.filter(cls => cls.label != 'frontpage')
-
+  if (selectedCollection.value == '') {
+    selectedCollection.value = myCollections[0].value
+  }
+  console.log(selectedCollection, 'selectedCollectionselectedCollection')
   return (
     // Render a discount form using Polaris components and the discount app components
 
@@ -327,7 +329,7 @@ export default function VolumeNew() {
                 <Card>
                   <Select
                     label="Select a Collection"
-                    options={filteredCollections}
+                    options={myCollections}
                     {...selectedCollection}
                   />
                 </Card>

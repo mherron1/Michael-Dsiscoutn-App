@@ -446,8 +446,10 @@ export default function VolumeNew() {
     };
 
 
-    let filteredCollections = myCollections.filter(cls => cls.label != 'frontpage')
-    // console.log(filteredCollections, 'filteredCollections')
+    if (selectedCollection.value == '') {
+        selectedCollection.value = myCollections[0].value
+    }
+    console.log(selectedCollection, 'selectedCollectionselectedCollection')
     return (
         // Render a discount form using Polaris components and the discount app components
 
@@ -480,7 +482,7 @@ export default function VolumeNew() {
                                 <Card>
                                     <Select
                                         label="Select a Collection"
-                                        options={filteredCollections}
+                                        options={myCollections}
                                         {...selectedCollection}
 
 
